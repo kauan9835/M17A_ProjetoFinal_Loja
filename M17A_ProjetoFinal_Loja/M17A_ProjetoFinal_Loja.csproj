@@ -165,6 +165,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseDados.cs" />
     <Compile Include="CLIENTES\clientes.cs" />
     <Compile Include="CLIENTES\F_clientes.cs">
       <SubType>Form</SubType>

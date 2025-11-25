@@ -52,17 +52,17 @@
             // 
             // textBox6
             // 
-            this.textBox6.Location = new System.Drawing.Point(160, 271);
+            this.textBox6.Location = new System.Drawing.Point(144, 270);
             this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(292, 22);
+            this.textBox6.Size = new System.Drawing.Size(308, 22);
             this.textBox6.TabIndex = 29;
             this.textBox6.TextChanged += new System.EventHandler(this.textBox6_TextChanged);
             // 
             // textBox5
             // 
-            this.textBox5.Location = new System.Drawing.Point(201, 322);
+            this.textBox5.Location = new System.Drawing.Point(188, 322);
             this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(251, 22);
+            this.textBox5.Size = new System.Drawing.Size(264, 22);
             this.textBox5.TabIndex = 28;
             // 
             // textBox4
