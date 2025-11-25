@@ -200,6 +200,9 @@
     <EmbeddedResource Include="Compras\F_compras.resx">
       <DependentUpon>F_compras.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EQUIPAMENTOS\F_equipamentos.resx">
+      <DependentUpon>F_equipamentos.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
