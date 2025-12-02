@@ -18,5 +18,8 @@ namespace M17A_ProjetoFinal_Loja
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
+        
     }
+    
 }
+

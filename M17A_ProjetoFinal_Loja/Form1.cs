@@ -8,33 +8,42 @@ namespace M17A_ProjetoFinal_Loja
 {
     public partial class Form1 : Form
     {
-        private BaseDados bd;
-
         public Form1()
         {
             InitializeComponent();
-            bd = new BaseDados("HardwareSystem");
         }
 
-        // Botão COMPRAR
-        private void btnComprar_Click(object sender, EventArgs e)
+        // Botão COMPRAS
+        private void btnCompras_Click(object sender, EventArgs e)
         {
+            // Cria a base de dados
+            BaseDados bd = new BaseDados("HardwareSystem");
+
+            // Abre o formulário de compras
             F_compras formCompras = new F_compras(bd);
-            formCompras.ShowDialog();
+            formCompras.Show();
         }
 
-        // Botão ADICIONAR EQUIPAMENTO
-        private void btnAdicionarEquipamento_Click(object sender, EventArgs e)
+        // Botão CLIENTES
+        private void btnClientes_Click(object sender, EventArgs e)
         {
-            F_equipamentos formEquipamentos = new F_equipamentos(bd);
-            formEquipamentos.ShowDialog();
-        }
+            // Cria a base de dados
+            BaseDados bd = new BaseDados("HardwareSystem");
 
-        // Botão ADICIONAR CLIENTE
-        private void btnAdicionarCliente_Click(object sender, EventArgs e)
-        {
+            // Abre o formulário de clientes
             F_clientes formClientes = new F_clientes(bd);
-            formClientes.ShowDialog();
+            formClientes.Show();
+        }
+
+        // Botão EQUIPAMENTOS
+        private void btnEquipamentos_Click(object sender, EventArgs e)
+        {
+            // Cria a base de dados
+            BaseDados bd = new BaseDados("HardwareSystem");
+
+            // Abre o formulário de equipamentos
+            F_equipamentos formEquipamentos = new F_equipamentos(bd);
+            formEquipamentos.Show();
         }
 
         // Botão SAIR
@@ -42,7 +51,5 @@ namespace M17A_ProjetoFinal_Loja
         {
             Application.Exit();
         }
-
-        
     }
 }

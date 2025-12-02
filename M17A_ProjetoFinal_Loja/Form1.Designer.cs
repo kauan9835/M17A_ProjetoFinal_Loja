@@ -28,59 +28,57 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
+            this.btnCompras = new System.Windows.Forms.Button();
+            this.btnSair = new System.Windows.Forms.Button();
+            this.btnEquipamentos = new System.Windows.Forms.Button();
+            this.btnClientes = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // button1
+            // btnCompras
             // 
-            this.button1.Location = new System.Drawing.Point(27, 24);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(127, 50);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-
-
+            this.btnCompras.Location = new System.Drawing.Point(27, 24);
+            this.btnCompras.Name = "btnCompras";
+            this.btnCompras.Size = new System.Drawing.Size(127, 50);
+            this.btnCompras.TabIndex = 0;
+            this.btnCompras.Text = "COMPRAS";
+            this.btnCompras.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // btnSair
             // 
-            this.button2.Location = new System.Drawing.Point(180, 94);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(127, 47);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnSair.Location = new System.Drawing.Point(180, 94);
+            this.btnSair.Name = "btnSair";
+            this.btnSair.Size = new System.Drawing.Size(127, 47);
+            this.btnSair.TabIndex = 1;
+            this.btnSair.Text = "SAIR";
+            this.btnSair.UseVisualStyleBackColor = true;
             // 
-            // button3
+            // btnEquipamentos
             // 
-            this.button3.Location = new System.Drawing.Point(338, 24);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(127, 50);
-            this.button3.TabIndex = 2;
-            this.button3.Text = "button3";
-            this.button3.UseVisualStyleBackColor = true;
+            this.btnEquipamentos.Location = new System.Drawing.Point(338, 24);
+            this.btnEquipamentos.Name = "btnEquipamentos";
+            this.btnEquipamentos.Size = new System.Drawing.Size(127, 50);
+            this.btnEquipamentos.TabIndex = 2;
+            this.btnEquipamentos.Text = "EQUIPAMENTOS";
+            this.btnEquipamentos.UseVisualStyleBackColor = true;
             // 
-            // button4
+            // btnClientes
             // 
-            this.button4.Location = new System.Drawing.Point(180, 24);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(127, 50);
-            this.button4.TabIndex = 3;
-            this.button4.Text = "button4";
-            this.button4.UseVisualStyleBackColor = true;
+            this.btnClientes.Location = new System.Drawing.Point(180, 24);
+            this.btnClientes.Name = "btnClientes";
+            this.btnClientes.Size = new System.Drawing.Size(127, 50);
+            this.btnClientes.TabIndex = 3;
+            this.btnClientes.Text = "CLIENTES";
+            this.btnClientes.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1469, 661);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnClientes);
+            this.Controls.Add(this.btnEquipamentos);
+            this.Controls.Add(this.btnSair);
+            this.Controls.Add(this.btnCompras);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -89,10 +87,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button btnCompras;
+        private System.Windows.Forms.Button btnSair;
+        private System.Windows.Forms.Button btnEquipamentos;
+        private System.Windows.Forms.Button btnClientes;
     }
 }
 
