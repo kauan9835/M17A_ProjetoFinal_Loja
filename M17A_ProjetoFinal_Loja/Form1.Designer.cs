@@ -42,6 +42,7 @@
             this.btnCompras.TabIndex = 0;
             this.btnCompras.Text = "COMPRAS";
             this.btnCompras.UseVisualStyleBackColor = true;
+            this.btnCompras.Click += new System.EventHandler(this.btnCompras_Click);
             // 
             // btnSair
             // 
@@ -51,6 +52,7 @@
             this.btnSair.TabIndex = 1;
             this.btnSair.Text = "SAIR";
             this.btnSair.UseVisualStyleBackColor = true;
+            this.btnSair.Click += new System.EventHandler(this.btnSair_Click);
             // 
             // btnEquipamentos
             // 
@@ -60,6 +62,7 @@
             this.btnEquipamentos.TabIndex = 2;
             this.btnEquipamentos.Text = "EQUIPAMENTOS";
             this.btnEquipamentos.UseVisualStyleBackColor = true;
+            this.btnEquipamentos.Click += new System.EventHandler(this.btnEquipamentos_Click);
             // 
             // btnClientes
             // 
@@ -69,6 +72,7 @@
             this.btnClientes.TabIndex = 3;
             this.btnClientes.Text = "CLIENTES";
             this.btnClientes.UseVisualStyleBackColor = true;
+            this.btnClientes.Click += new System.EventHandler(this.btnClientes_Click);
             // 
             // Form1
             // 

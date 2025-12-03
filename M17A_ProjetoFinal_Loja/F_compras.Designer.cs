@@ -1,4 +1,4 @@
-﻿namespace M17A_ProjetoFinal_Loja.Compras
+﻿namespace M17A_ProjetoFinal_Loja
 {
     partial class F_compras
     {

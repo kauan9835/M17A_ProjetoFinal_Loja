@@ -180,6 +180,7 @@
             this.button1.TabIndex = 30;
             this.button1.Text = "CANCELAR";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.btnCancelar_Click);
             // 
             // button2
             // 
@@ -189,6 +190,7 @@
             this.button2.TabIndex = 31;
             this.button2.Text = "EDITAR";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.btnEditar_Click);
             // 
             // dataGridView1
             // 
@@ -208,6 +210,7 @@
             this.button3.TabIndex = 33;
             this.button3.Text = "GUARDAR";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.btnGuardar_Click);
             // 
             // txtId
             // 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
 
-namespace M17A_ProjetoFinal_Loja.Compras
+namespace M17A_ProjetoFinal_Loja
 {
     public partial class F_compras : Form
     {

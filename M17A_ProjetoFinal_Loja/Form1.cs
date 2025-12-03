@@ -1,7 +1,4 @@
-﻿using M17A_ProjetoFinal_Loja.CLIENTES;
-using M17A_ProjetoFinal_Loja.Compras;
-using M17A_ProjetoFinal_Loja.EQUIPAMENTOS;
-using System;
+﻿using System;
 using System.Windows.Forms;
 
 namespace M17A_ProjetoFinal_Loja
@@ -51,5 +48,6 @@ namespace M17A_ProjetoFinal_Loja
         {
             Application.Exit();
         }
+
     }
 }
