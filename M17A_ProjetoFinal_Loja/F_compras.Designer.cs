@@ -42,6 +42,7 @@
             this.label9 = new System.Windows.Forms.Label();
             this.cmbCategoria = new System.Windows.Forms.ComboBox();
             this.cmbCompatibilidade = new System.Windows.Forms.ComboBox();
+            this.lb_feedback = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewEquipamentos)).BeginInit();
             this.SuspendLayout();
             // 
@@ -53,6 +54,7 @@
             this.btnComprar.TabIndex = 52;
             this.btnComprar.Text = "COMPRAR";
             this.btnComprar.UseVisualStyleBackColor = true;
+            this.btnComprar.Click += new System.EventHandler(this.btnComprar_Click);
             // 
             // dataGridViewEquipamentos
             // 
@@ -72,6 +74,7 @@
             this.btnFiltrar.TabIndex = 50;
             this.btnFiltrar.Text = "FILTRAR";
             this.btnFiltrar.UseVisualStyleBackColor = true;
+            this.btnFiltrar.Click += new System.EventHandler(this.btnFiltrar_Click_1);
             // 
             // btnCancelar
             // 
@@ -81,6 +84,7 @@
             this.btnCancelar.TabIndex = 49;
             this.btnCancelar.Text = "CANCELAR";
             this.btnCancelar.UseVisualStyleBackColor = true;
+            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click_1);
             // 
             // txtModelo
             // 
@@ -165,11 +169,20 @@
             this.cmbCompatibilidade.Size = new System.Drawing.Size(230, 24);
             this.cmbCompatibilidade.TabIndex = 55;
             // 
+            // lb_feedback
+            // 
+            this.lb_feedback.AutoSize = true;
+            this.lb_feedback.Location = new System.Drawing.Point(433, 37);
+            this.lb_feedback.Name = "lb_feedback";
+            this.lb_feedback.Size = new System.Drawing.Size(0, 16);
+            this.lb_feedback.TabIndex = 56;
+            // 
             // F_compras
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1491, 619);
+            this.Controls.Add(this.lb_feedback);
             this.Controls.Add(this.cmbCompatibilidade);
             this.Controls.Add(this.cmbCategoria);
             this.Controls.Add(this.label9);
@@ -208,5 +221,6 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.ComboBox cmbCategoria;
         private System.Windows.Forms.ComboBox cmbCompatibilidade;
+        private System.Windows.Forms.Label lb_feedback;
     }
 }

@@ -52,13 +52,14 @@
             this.label9 = new System.Windows.Forms.Label();
             this.txtDescricao = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dgv_equipamentos = new System.Windows.Forms.DataGridView();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.btnInserirImagem = new System.Windows.Forms.Button();
             this.lblImagem = new System.Windows.Forms.Label();
             this.btnRemoverImagem = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.lb_feedback = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_equipamentos)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -70,6 +71,7 @@
             this.btnEditar.TabIndex = 65;
             this.btnEditar.Text = "EDITAR";
             this.btnEditar.UseVisualStyleBackColor = true;
+            this.btnEditar.Click += new System.EventHandler(this.btnEditar_Click);
             // 
             // btnInserir
             // 
@@ -79,6 +81,7 @@
             this.btnInserir.TabIndex = 64;
             this.btnInserir.Text = "INSERIR";
             this.btnInserir.UseVisualStyleBackColor = true;
+            this.btnInserir.Click += new System.EventHandler(this.bt_guardar_Click);
             // 
             // btnCancelar
             // 
@@ -88,6 +91,7 @@
             this.btnCancelar.TabIndex = 63;
             this.btnCancelar.Text = "CANCELAR";
             this.btnCancelar.UseVisualStyleBackColor = true;
+            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
             // 
             // txtCodigo
             // 
@@ -173,6 +177,9 @@
             // cmbCategoria
             // 
             this.cmbCategoria.FormattingEnabled = true;
+            this.cmbCategoria.Items.AddRange(new object[] {
+            "Grafica",
+            "Processador"});
             this.cmbCategoria.Location = new System.Drawing.Point(98, 255);
             this.cmbCategoria.Name = "cmbCategoria";
             this.cmbCategoria.Size = new System.Drawing.Size(245, 24);
@@ -260,15 +267,17 @@
             this.label10.TabIndex = 81;
             this.label10.Text = "Descrição";
             // 
-            // dataGridView1
+            // dgv_equipamentos
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(635, 21);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(601, 267);
-            this.dataGridView1.TabIndex = 83;
+            this.dgv_equipamentos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgv_equipamentos.Location = new System.Drawing.Point(635, 21);
+            this.dgv_equipamentos.Name = "dgv_equipamentos";
+            this.dgv_equipamentos.RowHeadersWidth = 51;
+            this.dgv_equipamentos.RowTemplate.Height = 24;
+            this.dgv_equipamentos.Size = new System.Drawing.Size(601, 267);
+            this.dgv_equipamentos.TabIndex = 83;
+            this.dgv_equipamentos.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_equipamentos_CellClick);
+            this.dgv_equipamentos.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_equipamentos_CellContentClick);
             // 
             // pictureBox1
             // 
@@ -286,6 +295,7 @@
             this.btnInserirImagem.TabIndex = 85;
             this.btnInserirImagem.Text = "INSERIR IMAGEM";
             this.btnInserirImagem.UseVisualStyleBackColor = true;
+            this.btnInserirImagem.Click += new System.EventHandler(this.btnInserirImagem_Click);
             // 
             // lblImagem
             // 
@@ -304,6 +314,7 @@
             this.btnRemoverImagem.TabIndex = 87;
             this.btnRemoverImagem.Text = "REMOVER IMAGEM";
             this.btnRemoverImagem.UseVisualStyleBackColor = true;
+            this.btnRemoverImagem.Click += new System.EventHandler(this.btnRemoverImagem_Click);
             // 
             // btnEliminar
             // 
@@ -313,18 +324,28 @@
             this.btnEliminar.TabIndex = 88;
             this.btnEliminar.Text = "ELIMINAR";
             this.btnEliminar.UseVisualStyleBackColor = true;
+            this.btnEliminar.Click += new System.EventHandler(this.btnEliminar_Click);
+            // 
+            // lb_feedback
+            // 
+            this.lb_feedback.AutoSize = true;
+            this.lb_feedback.Location = new System.Drawing.Point(402, 75);
+            this.lb_feedback.Name = "lb_feedback";
+            this.lb_feedback.Size = new System.Drawing.Size(0, 16);
+            this.lb_feedback.TabIndex = 89;
             // 
             // F_equipamentos
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1482, 662);
+            this.Controls.Add(this.lb_feedback);
             this.Controls.Add(this.btnEliminar);
             this.Controls.Add(this.btnRemoverImagem);
             this.Controls.Add(this.lblImagem);
             this.Controls.Add(this.btnInserirImagem);
             this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.dgv_equipamentos);
             this.Controls.Add(this.txtDescricao);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.txtPreco);
@@ -351,8 +372,8 @@
             this.Controls.Add(this.label1);
             this.Name = "F_equipamentos";
             this.Text = "F_equipamentos";
-
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.Load += new System.EventHandler(this.F_equipamentos_Load_1);
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_equipamentos)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -384,11 +405,12 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox txtDescricao;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView dgv_equipamentos;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button btnInserirImagem;
         private System.Windows.Forms.Label lblImagem;
         private System.Windows.Forms.Button btnRemoverImagem;
         private System.Windows.Forms.Button btnEliminar;
+        private System.Windows.Forms.Label lb_feedback;
     }
 }

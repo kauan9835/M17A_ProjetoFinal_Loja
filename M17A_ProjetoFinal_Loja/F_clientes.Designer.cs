@@ -43,12 +43,13 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnEliminar = new System.Windows.Forms.Button();
+            this.btnEditar = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnGuardar = new System.Windows.Forms.Button();
             this.txtId = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.lb_feedback = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -172,25 +173,25 @@
             this.label1.TabIndex = 15;
             this.label1.Text = "Nome";
             // 
-            // button1
+            // btnEliminar
             // 
-            this.button1.Location = new System.Drawing.Point(108, 463);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(168, 68);
-            this.button1.TabIndex = 30;
-            this.button1.Text = "CANCELAR";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.btnCancelar_Click);
+            this.btnEliminar.Location = new System.Drawing.Point(108, 463);
+            this.btnEliminar.Name = "btnEliminar";
+            this.btnEliminar.Size = new System.Drawing.Size(168, 68);
+            this.btnEliminar.TabIndex = 30;
+            this.btnEliminar.Text = "ELIMINAR";
+            this.btnEliminar.UseVisualStyleBackColor = true;
+            this.btnEliminar.Click += new System.EventHandler(this.btnCancelar_Click);
             // 
-            // button2
+            // btnEditar
             // 
-            this.button2.Location = new System.Drawing.Point(279, 463);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(168, 68);
-            this.button2.TabIndex = 31;
-            this.button2.Text = "EDITAR";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.btnEditar_Click);
+            this.btnEditar.Location = new System.Drawing.Point(279, 463);
+            this.btnEditar.Name = "btnEditar";
+            this.btnEditar.Size = new System.Drawing.Size(168, 68);
+            this.btnEditar.TabIndex = 31;
+            this.btnEditar.Text = "EDITAR";
+            this.btnEditar.UseVisualStyleBackColor = true;
+            this.btnEditar.Click += new System.EventHandler(this.btnEditar_Click);
             // 
             // dataGridView1
             // 
@@ -201,16 +202,17 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(742, 425);
             this.dataGridView1.TabIndex = 32;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
-            // button3
+            // btnGuardar
             // 
-            this.button3.Location = new System.Drawing.Point(196, 547);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(168, 68);
-            this.button3.TabIndex = 33;
-            this.button3.Text = "GUARDAR";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.btnGuardar_Click);
+            this.btnGuardar.Location = new System.Drawing.Point(196, 547);
+            this.btnGuardar.Name = "btnGuardar";
+            this.btnGuardar.Size = new System.Drawing.Size(168, 68);
+            this.btnGuardar.TabIndex = 33;
+            this.btnGuardar.Text = "GUARDAR";
+            this.btnGuardar.UseVisualStyleBackColor = true;
+            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
             // 
             // txtId
             // 
@@ -228,17 +230,26 @@
             this.label9.TabIndex = 34;
             this.label9.Text = "ID";
             // 
+            // lb_feedback
+            // 
+            this.lb_feedback.AutoSize = true;
+            this.lb_feedback.Location = new System.Drawing.Point(490, 48);
+            this.lb_feedback.Name = "lb_feedback";
+            this.lb_feedback.Size = new System.Drawing.Size(0, 16);
+            this.lb_feedback.TabIndex = 36;
+            // 
             // F_clientes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1476, 620);
+            this.Controls.Add(this.lb_feedback);
             this.Controls.Add(this.txtId);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.btnGuardar);
             this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnEditar);
+            this.Controls.Add(this.btnEliminar);
             this.Controls.Add(this.txtNIF);
             this.Controls.Add(this.txtTelemovel);
             this.Controls.Add(this.txtEmail);
@@ -279,12 +290,13 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnEliminar;
+        private System.Windows.Forms.Button btnEditar;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.TextBox txtNome;
         private System.Windows.Forms.TextBox txtId;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label lb_feedback;
     }
 }

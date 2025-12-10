@@ -8,7 +8,7 @@ using Microsoft.Data.SqlClient;
 
 namespace M17A_ProjetoFinal_Loja
 {
-    public class Equipamento
+    public class Equipamentos : Item
     {
         // Propriedades (como campos da tabela)
         public int Id { get; set; }
@@ -26,7 +26,7 @@ namespace M17A_ProjetoFinal_Loja
         private BaseDados bd;
 
         // Construtor
-        public Equipamento(BaseDados bd)
+        public Equipamentos(BaseDados bd)
         {
             this.bd = bd;
         }

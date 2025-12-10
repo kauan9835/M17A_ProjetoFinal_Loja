@@ -59,7 +59,74 @@ namespace M17A_ProjetoFinal_Loja
             }
         }
 
-        private void btnFiltrar_Click(object sender, EventArgs e)
+        private void RegistrarCompra(int equipamentoId, string nomeEquipamento, decimal preco)
+        {
+            // Registrar a compra
+            string sqlCompra = @"
+                INSERT INTO Compras (EquipamentoId, Quantidade, PrecoUnitario, NumeroFatura) 
+                VALUES (@EquipamentoId, @Quantidade, @PrecoUnitario, @NumeroFatura)";
+
+            var parametrosCompra = new List<SqlParameter>
+            {
+                new SqlParameter("@EquipamentoId", equipamentoId),
+                new SqlParameter("@Quantidade", 1),
+                new SqlParameter("@PrecoUnitario", preco),
+                new SqlParameter("@NumeroFatura", $"FAT-{DateTime.Now:yyyyMMdd-HHmmss}")
+            };
+
+            bd.ExecutarSQL(sqlCompra, parametrosCompra);
+
+            // Atualizar estado do equipamento para vendido (se tiveres coluna Estado)
+            try
+            {
+                string updateEquipamento = "UPDATE Equipamentos SET Estado = 0 WHERE Id = @Id";
+                var parametrosUpdate = new List<SqlParameter>
+                {
+                    new SqlParameter("@Id", equipamentoId)
+                };
+                bd.ExecutarSQL(updateEquipamento, parametrosUpdate);
+            }
+            catch
+            {
+                // Se não tiver coluna Estado, ignora
+            }
+        }
+
+        private void LimparCampos()
+        {
+            txtNome.Clear();
+            txtModelo.Clear();
+            cmbCategoria.SelectedIndex = -1;
+            cmbCompatibilidade.SelectedIndex = -1;
+        }
+
+        private void cmbCategoria_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Filtra automaticamente quando seleciona uma categoria
+            btnFiltrar_Click_1(sender, e);
+        }
+
+        private void cmbCompatibilidade_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Filtra automaticamente quando seleciona uma compatibilidade
+            btnFiltrar_Click_1(sender, e);
+        }
+
+        private void txtNome_TextChanged(object sender, EventArgs e)
+        {
+            // Filtra automaticamente quando digita no nome
+            btnFiltrar_Click_1(sender, e);
+        }
+
+        private void txtModelo_TextChanged(object sender, EventArgs e)
+        {
+            // Filtra automaticamente quando digita no modelo
+            btnFiltrar_Click_1(sender, e);
+        }
+
+       
+
+        private void btnFiltrar_Click_1(object sender, EventArgs e)
         {
             string nome = txtNome.Text;
             string categoria = cmbCategoria.Text;
@@ -129,74 +196,9 @@ namespace M17A_ProjetoFinal_Loja
             }
         }
 
-        private void RegistrarCompra(int equipamentoId, string nomeEquipamento, decimal preco)
-        {
-            // Registrar a compra
-            string sqlCompra = @"
-                INSERT INTO Compras (EquipamentoId, Quantidade, PrecoUnitario, NumeroFatura) 
-                VALUES (@EquipamentoId, @Quantidade, @PrecoUnitario, @NumeroFatura)";
-
-            var parametrosCompra = new List<SqlParameter>
-            {
-                new SqlParameter("@EquipamentoId", equipamentoId),
-                new SqlParameter("@Quantidade", 1),
-                new SqlParameter("@PrecoUnitario", preco),
-                new SqlParameter("@NumeroFatura", $"FAT-{DateTime.Now:yyyyMMdd-HHmmss}")
-            };
-
-            bd.ExecutarSQL(sqlCompra, parametrosCompra);
-
-            // Atualizar estado do equipamento para vendido (se tiveres coluna Estado)
-            try
-            {
-                string updateEquipamento = "UPDATE Equipamentos SET Estado = 0 WHERE Id = @Id";
-                var parametrosUpdate = new List<SqlParameter>
-                {
-                    new SqlParameter("@Id", equipamentoId)
-                };
-                bd.ExecutarSQL(updateEquipamento, parametrosUpdate);
-            }
-            catch
-            {
-                // Se não tiver coluna Estado, ignora
-            }
-        }
-
-        private void btnCancelar_Click(object sender, EventArgs e)
+        private void btnCancelar_Click_1(object sender, EventArgs e)
         {
             this.Close();
-        }
-
-        private void LimparCampos()
-        {
-            txtNome.Clear();
-            txtModelo.Clear();
-            cmbCategoria.SelectedIndex = -1;
-            cmbCompatibilidade.SelectedIndex = -1;
-        }
-
-        private void cmbCategoria_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Filtra automaticamente quando seleciona uma categoria
-            btnFiltrar_Click(sender, e);
-        }
-
-        private void cmbCompatibilidade_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Filtra automaticamente quando seleciona uma compatibilidade
-            btnFiltrar_Click(sender, e);
-        }
-
-        private void txtNome_TextChanged(object sender, EventArgs e)
-        {
-            // Filtra automaticamente quando digita no nome
-            btnFiltrar_Click(sender, e);
-        }
-
-        private void txtModelo_TextChanged(object sender, EventArgs e)
-        {
-            // Filtra automaticamente quando digita no modelo
-            btnFiltrar_Click(sender, e);
         }
     }
 }
