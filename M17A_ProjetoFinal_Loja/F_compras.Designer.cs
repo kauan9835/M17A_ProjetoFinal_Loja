@@ -43,6 +43,9 @@
             this.cmbCategoria = new System.Windows.Forms.ComboBox();
             this.cmbCompatibilidade = new System.Windows.Forms.ComboBox();
             this.lb_feedback = new System.Windows.Forms.Label();
+            this.lblSelecionarCliente = new System.Windows.Forms.Label();
+            this.cmbClientes = new System.Windows.Forms.ComboBox();
+            this.panelTalao = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewEquipamentos)).BeginInit();
             this.SuspendLayout();
             // 
@@ -177,11 +180,38 @@
             this.lb_feedback.Size = new System.Drawing.Size(0, 16);
             this.lb_feedback.TabIndex = 56;
             // 
+            // lblSelecionarCliente
+            // 
+            this.lblSelecionarCliente.AutoSize = true;
+            this.lblSelecionarCliente.Location = new System.Drawing.Point(327, 37);
+            this.lblSelecionarCliente.Name = "lblSelecionarCliente";
+            this.lblSelecionarCliente.Size = new System.Drawing.Size(116, 16);
+            this.lblSelecionarCliente.TabIndex = 57;
+            this.lblSelecionarCliente.Text = "Selecionar Cliente";
+            // 
+            // cmbClientes
+            // 
+            this.cmbClientes.FormattingEnabled = true;
+            this.cmbClientes.Location = new System.Drawing.Point(439, 37);
+            this.cmbClientes.Name = "cmbClientes";
+            this.cmbClientes.Size = new System.Drawing.Size(201, 24);
+            this.cmbClientes.TabIndex = 58;
+            // 
+            // panelTalao
+            // 
+            this.panelTalao.Location = new System.Drawing.Point(440, 103);
+            this.panelTalao.Name = "panelTalao";
+            this.panelTalao.Size = new System.Drawing.Size(200, 328);
+            this.panelTalao.TabIndex = 59;
+            // 
             // F_compras
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1491, 619);
+            this.Controls.Add(this.panelTalao);
+            this.Controls.Add(this.cmbClientes);
+            this.Controls.Add(this.lblSelecionarCliente);
             this.Controls.Add(this.lb_feedback);
             this.Controls.Add(this.cmbCompatibilidade);
             this.Controls.Add(this.cmbCategoria);
@@ -222,5 +252,8 @@
         private System.Windows.Forms.ComboBox cmbCategoria;
         private System.Windows.Forms.ComboBox cmbCompatibilidade;
         private System.Windows.Forms.Label lb_feedback;
+        private System.Windows.Forms.Label lblSelecionarCliente;
+        private System.Windows.Forms.ComboBox cmbClientes;
+        private System.Windows.Forms.Panel panelTalao;
     }
 }

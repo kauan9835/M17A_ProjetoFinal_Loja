@@ -162,5 +162,7 @@ namespace M17A_ProjetoFinal_Loja
 
             bd.ExecutarSQL(sql, parametros);
         }
+
+
     }
 }

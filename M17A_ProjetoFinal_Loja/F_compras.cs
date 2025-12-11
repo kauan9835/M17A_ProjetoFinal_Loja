@@ -1,27 +1,32 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Data.SqlClient;
 
 namespace M17A_ProjetoFinal_Loja
 {
     public partial class F_compras : Form
     {
         private BaseDados bd;
+        private Dictionary<int, string> clientesDict = new Dictionary<int, string>();
 
         public F_compras(BaseDados bd)
         {
+
             InitializeComponent();
             this.bd = bd;
             CarregarEquipamentos();
             CarregarCategorias();
             CarregarCompatibilidades();
+            CarregarClientesNoComboBox();
+
         }
 
         private void CarregarEquipamentos()
@@ -59,39 +64,6 @@ namespace M17A_ProjetoFinal_Loja
             }
         }
 
-        private void RegistrarCompra(int equipamentoId, string nomeEquipamento, decimal preco)
-        {
-            // Registrar a compra
-            string sqlCompra = @"
-                INSERT INTO Compras (EquipamentoId, Quantidade, PrecoUnitario, NumeroFatura) 
-                VALUES (@EquipamentoId, @Quantidade, @PrecoUnitario, @NumeroFatura)";
-
-            var parametrosCompra = new List<SqlParameter>
-            {
-                new SqlParameter("@EquipamentoId", equipamentoId),
-                new SqlParameter("@Quantidade", 1),
-                new SqlParameter("@PrecoUnitario", preco),
-                new SqlParameter("@NumeroFatura", $"FAT-{DateTime.Now:yyyyMMdd-HHmmss}")
-            };
-
-            bd.ExecutarSQL(sqlCompra, parametrosCompra);
-
-            // Atualizar estado do equipamento para vendido (se tiveres coluna Estado)
-            try
-            {
-                string updateEquipamento = "UPDATE Equipamentos SET Estado = 0 WHERE Id = @Id";
-                var parametrosUpdate = new List<SqlParameter>
-                {
-                    new SqlParameter("@Id", equipamentoId)
-                };
-                bd.ExecutarSQL(updateEquipamento, parametrosUpdate);
-            }
-            catch
-            {
-                // Se não tiver coluna Estado, ignora
-            }
-        }
-
         private void LimparCampos()
         {
             txtNome.Clear();
@@ -124,7 +96,7 @@ namespace M17A_ProjetoFinal_Loja
             btnFiltrar_Click_1(sender, e);
         }
 
-       
+
 
         private void btnFiltrar_Click_1(object sender, EventArgs e)
         {
@@ -170,6 +142,19 @@ namespace M17A_ProjetoFinal_Loja
         {
             if (dataGridViewEquipamentos.SelectedRows.Count > 0)
             {
+                // Verificar se um cliente foi selecionado
+                if (cmbClientes.SelectedIndex <= 0) // LINHA MODIFICADA
+                {
+                    MessageBox.Show("Por favor, selecione um cliente primeiro!", "Selecionar Cliente",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    cmbClientes.Focus();
+                    return;
+                }
+
+                // Obter ID do cliente selecionado
+                int clienteId = Convert.ToInt32(clientesDict[cmbClientes.SelectedIndex]); // LINHA NOVA
+                string nomeCliente = cmbClientes.Text.Split('(')[0].Trim(); // LINHA NOVA
+
                 DataGridViewRow row = dataGridViewEquipamentos.SelectedRows[0];
 
                 try
@@ -178,27 +163,144 @@ namespace M17A_ProjetoFinal_Loja
                     string nomeEquipamento = row.Cells["Nome"].Value.ToString();
                     decimal preco = Convert.ToDecimal(row.Cells["Preco"].Value);
 
-                    // Registrar a compra
-                    RegistrarCompra(equipamentoId, nomeEquipamento, preco);
+                    string numeroFatura = $"FAT-{DateTime.Now:yyyyMMdd-HHmmss}";
+                    DateTime dataCompra = DateTime.Now;
 
-                    MessageBox.Show($"Compra realizada com sucesso!\nEquipamento: {nomeEquipamento}");
+                    // Registrar a compra com cliente - MODIFICADO
+                    RegistrarCompra(equipamentoId, nomeEquipamento, preco, numeroFatura,
+                                   dataCompra, clienteId);
+
+                    // MOSTRAR TALÃO NA TELA - LINHA NOVA
+                    MostrarTalaoTela(numeroFatura, nomeEquipamento, preco, dataCompra,
+                                   nomeCliente, cmbClientes.Text);
+
                     LimparCampos();
                     CarregarEquipamentos();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Erro na compra: {ex.Message}");
+                    MessageBox.Show($"Erro na compra: {ex.Message}", "Erro",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
             {
-                MessageBox.Show("Selecione um equipamento para comprar!");
+                MessageBox.Show("Selecione um equipamento para comprar!", "Aviso",
+                               MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private void btnCancelar_Click_1(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void CarregarClientesNoComboBox()
+        {
+            try
+            {
+                string sql = "SELECT Id, Nome, NIF FROM Clientes ORDER BY Nome";
+                DataTable dt = bd.DevolveSQL(sql);
+
+                cmbClientes.Items.Clear();
+                clientesDict.Clear();
+
+                // Adicionar item vazio no início
+                cmbClientes.Items.Add("-- Selecione um cliente --");
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    int id = Convert.ToInt32(row["Id"]);
+                    string nome = row["Nome"].ToString();
+                    string nif = row["NIF"].ToString();
+
+                    string displayText = $"{nome} (NIF: {nif})";
+                    cmbClientes.Items.Add(displayText);
+                    clientesDict.Add(cmbClientes.Items.Count - 1, id.ToString());
+                }
+
+                cmbClientes.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar clientes: {ex.Message}", "Erro",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void MostrarTalaoTela(string numeroFatura, string nomeEquipamento, decimal preco,
+                                     DateTime dataCompra, string nomeCliente, string infoCliente)
+        {
+            try
+            {
+                // Limpar panel se já tiver conteúdo
+                panelTalao.Controls.Clear();
+                panelTalao.Visible = true;
+                panelTalao.BorderStyle = BorderStyle.FixedSingle;
+                panelTalao.BackColor = Color.White;
+
+                int yPos = 20;
+                int margem = 20;
+
+                // CABEÇALHO
+                Label lblCabecalho = new Label();
+                lblCabecalho.Text = "LOJA DE EQUIPAMENTOS";
+                lblCabecalho.Font = new Font("Arial", 16, FontStyle.Bold);
+                lblCabecalho.Location = new Point(margem, yPos);
+                lblCabecalho.Size = new Size(400, 30);
+                lblCabecalho.TextAlign = ContentAlignment.MiddleCenter;
+                panelTalao.Controls.Add(lblCabecalho);
+                yPos += 40;
+
+                // ... (resto do código do método MostrarTalaoTela que forneci anteriormente)
+                // CONTINUAR COM TODO O CÓDIGO DO MÉTODO MostrarTalaoTela AQUI
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao gerar talão: {ex.Message}", "Erro",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ImprimirTalao(string numeroFatura, string nomeEquipamento, decimal preco,
+                                  DateTime dataCompra, string nomeCliente, string infoCliente)
+        {
+            try
+            {
+                PrintDocument pd = new PrintDocument();
+                pd.PrintPage += (sender, e) =>
+                {
+                    Graphics g = e.Graphics;
+
+                    // Configurar fontes
+                    Font fontTitulo = new Font("Arial", 18, FontStyle.Bold);
+                    Font fontNormal = new Font("Arial", 12);
+                    Font fontNegrito = new Font("Arial", 12, FontStyle.Bold);
+                    Font fontPequeno = new Font("Arial", 10);
+
+                    // ... (código de impressão completo)
+                    // COLAR AQUI TODO O CÓDIGO DO EVENTO PrintPage
+                };
+
+                PrintDialog printDialog = new PrintDialog();
+                printDialog.Document = pd;
+
+                if (printDialog.ShowDialog() == DialogResult.OK)
+                {
+                    pd.Print();
+                    MessageBox.Show("Talão enviado para impressão!", "Sucesso",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                pd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao imprimir: {ex.Message}", "Erro",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+
         }
     }
 }

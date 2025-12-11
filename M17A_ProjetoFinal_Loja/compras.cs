@@ -164,5 +164,29 @@ namespace M17A_ProjetoFinal_Loja
         {
             return Quantidade * PrecoUnitario;
         }
+
+        public void AtualizarStock()
+        {
+            string sqlSelect = "SELECT Stock FROM Equipamentos WHERE Id = @Id";
+            var p1 = new List<SqlParameter> { new SqlParameter("@Id", EquipamentoId) };
+
+            DataTable dt = bd.DevolveSQL(sqlSelect, p1);
+            int stockAtual = Convert.ToInt32(dt.Rows[0]["Stock"]);
+            int novoStock = stockAtual - Quantidade;
+
+            if (novoStock < 0)
+                novoStock = 0;
+
+            string sqlUpdate = "UPDATE Equipamentos SET Stock = @Stock WHERE Id = @Id";
+            var p2 = new List<SqlParameter>
+    {
+        new SqlParameter("@Stock", novoStock),
+        new SqlParameter("@Id", EquipamentoId)
+    };
+
+            bd.ExecutarSQL(sqlUpdate, p2);
+        }
+
+
     }
 }
