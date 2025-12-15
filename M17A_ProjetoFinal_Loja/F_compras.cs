@@ -31,8 +31,8 @@ namespace M17A_ProjetoFinal_Loja
 
         private void CarregarEquipamentos()
         {
-            string sql = "SELECT * FROM Equipamentos ORDER BY Nome";
-            DataTable dt = bd.DevolveSQL(sql);
+            DataTable dt = Compra.ObterEquipamentosDisponiveis(bd);
+
             dataGridViewEquipamentos.DataSource = dt;
         }
 
@@ -104,37 +104,8 @@ namespace M17A_ProjetoFinal_Loja
             string categoria = cmbCategoria.Text;
             string compatibilidade = cmbCompatibilidade.Text;
             string modelo = txtModelo.Text;
+            DataTable dt = Compra.ObterEquipamentosDisponiveis(bd, nome, categoria, compatibilidade, modelo);
 
-            string sql = "SELECT * FROM Equipamentos WHERE 1=1";
-            var parametros = new List<SqlParameter>();
-
-            if (!string.IsNullOrWhiteSpace(nome))
-            {
-                sql += " AND Nome LIKE @Nome";
-                parametros.Add(new SqlParameter("@Nome", $"%{nome}%"));
-            }
-
-            if (!string.IsNullOrWhiteSpace(categoria))
-            {
-                sql += " AND Categoria = @Categoria";
-                parametros.Add(new SqlParameter("@Categoria", categoria));
-            }
-
-            if (!string.IsNullOrWhiteSpace(compatibilidade))
-            {
-                sql += " AND Compatibilidade = @Compatibilidade";
-                parametros.Add(new SqlParameter("@Compatibilidade", compatibilidade));
-            }
-
-            if (!string.IsNullOrWhiteSpace(modelo))
-            {
-                sql += " AND Marca LIKE @Modelo";
-                parametros.Add(new SqlParameter("@Modelo", $"%{modelo}%"));
-            }
-
-            sql += " ORDER BY Nome";
-
-            DataTable dt = bd.DevolveSQL(sql, parametros);
             dataGridViewEquipamentos.DataSource = dt;
         }
 
@@ -166,9 +137,30 @@ namespace M17A_ProjetoFinal_Loja
                     string numeroFatura = $"FAT-{DateTime.Now:yyyyMMdd-HHmmss}";
                     DateTime dataCompra = DateTime.Now;
 
-                    // Registrar a compra com cliente - MODIFICADO
-                    RegistrarCompra(equipamentoId, nomeEquipamento, preco, numeroFatura,
-                                   dataCompra, clienteId);
+                    // USAR A CLASSE COMPRA (sem SQL no F_compras)
+                    var compra = new Compra(bd)
+                    {
+                        ClienteId = clienteId,
+                        EquipamentoId = equipamentoId,
+                        Quantidade = 1,
+                        PrecoUnitario = preco,
+                        NumeroFatura = numeroFatura,
+                        DataCompra = dataCompra
+                    };
+
+                    // Validar os dados
+                    var erros = compra.Validar();
+                    if (erros.Count > 0)
+                    {
+                        MessageBox.Show($"Erros na compra:\n{string.Join("\n", erros)}",
+                                       "Erro de Validação",
+                                       MessageBoxButtons.OK,
+                                       MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Adicionar a compra (SQL está na classe Compra)
+                    compra.Adicionar();
 
                     // MOSTRAR TALÃO NA TELA - LINHA NOVA
                     MostrarTalaoTela(numeroFatura, nomeEquipamento, preco, dataCompra,
@@ -231,35 +223,92 @@ namespace M17A_ProjetoFinal_Loja
         private void MostrarTalaoTela(string numeroFatura, string nomeEquipamento, decimal preco,
                                      DateTime dataCompra, string nomeCliente, string infoCliente)
         {
-            try
-            {
-                // Limpar panel se já tiver conteúdo
-                panelTalao.Controls.Clear();
-                panelTalao.Visible = true;
-                panelTalao.BorderStyle = BorderStyle.FixedSingle;
-                panelTalao.BackColor = Color.White;
+           {
+    try
+    {
+        // Limpar panel
+        panelTalao.Controls.Clear();
+        panelTalao.Visible = true;
+        panelTalao.BackColor = Color.White;
+        panelTalao.BorderStyle = BorderStyle.FixedSingle;
 
-                int yPos = 20;
-                int margem = 20;
+        int yPos = 20;
+        int margem = 20;
 
-                // CABEÇALHO
-                Label lblCabecalho = new Label();
-                lblCabecalho.Text = "LOJA DE EQUIPAMENTOS";
-                lblCabecalho.Font = new Font("Arial", 16, FontStyle.Bold);
-                lblCabecalho.Location = new Point(margem, yPos);
-                lblCabecalho.Size = new Size(400, 30);
-                lblCabecalho.TextAlign = ContentAlignment.MiddleCenter;
-                panelTalao.Controls.Add(lblCabecalho);
-                yPos += 40;
+        // 1. CABEÇALHO (já tem)
+        Label lblCabecalho = new Label();
+        lblCabecalho.Text = "LOJA DE EQUIPAMENTOS";
+        lblCabecalho.Font = new Font("Arial", 16, FontStyle.Bold);
+        lblCabecalho.Location = new Point(margem, yPos);
+        lblCabecalho.Size = new Size(400, 30);
+        lblCabecalho.TextAlign = ContentAlignment.MiddleCenter;
+        panelTalao.Controls.Add(lblCabecalho);
+        yPos += 40;
 
-                // ... (resto do código do método MostrarTalaoTela que forneci anteriormente)
-                // CONTINUAR COM TODO O CÓDIGO DO MÉTODO MostrarTalaoTela AQUI
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao gerar talão: {ex.Message}", "Erro",
-                               MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+        // 2. Fatura e Data
+        Label lblFatura = new Label();
+        lblFatura.Text = $"Fatura: {numeroFatura}";
+        lblFatura.Font = new Font("Arial", 10);
+        lblFatura.Location = new Point(margem, yPos);
+        lblFatura.Size = new Size(400, 20);
+        panelTalao.Controls.Add(lblFatura);
+        yPos += 25;
+
+        Label lblData = new Label();
+        lblData.Text = $"Data: {dataCompra:dd/MM/yyyy HH:mm}";
+        lblData.Font = new Font("Arial", 10);
+        lblData.Location = new Point(margem, yPos);
+        lblData.Size = new Size(400, 20);
+        panelTalao.Controls.Add(lblData);
+        yPos += 30;
+
+        // 3. Cliente
+        Label lblCliente = new Label();
+        lblCliente.Text = $"Cliente: {nomeCliente}";
+        lblCliente.Font = new Font("Arial", 10, FontStyle.Bold);
+        lblCliente.Location = new Point(margem, yPos);
+        lblCliente.Size = new Size(400, 20);
+        panelTalao.Controls.Add(lblCliente);
+        yPos += 25;
+
+        // 4. Produto
+        Label lblProduto = new Label();
+        lblProduto.Text = $"Produto: {nomeEquipamento}";
+        lblProduto.Font = new Font("Arial", 10);
+        lblProduto.Location = new Point(margem, yPos);
+        lblProduto.Size = new Size(400, 20);
+        panelTalao.Controls.Add(lblProduto);
+        yPos += 25;
+
+        // 5. Preço
+        Label lblPreco = new Label();
+        lblPreco.Text = $"Preço: {preco:C2}";
+        lblPreco.Font = new Font("Arial", 10);
+        lblPreco.Location = new Point(margem, yPos);
+        lblPreco.Size = new Size(400, 20);
+        panelTalao.Controls.Add(lblPreco);
+        yPos += 40;
+
+        // 6. Botão Fechar
+        Button btnFechar = new Button();
+        btnFechar.Text = "Fechar";
+        btnFechar.Location = new Point(150, yPos);
+        btnFechar.Size = new Size(100, 30);
+        btnFechar.Click += (s, e) => panelTalao.Visible = false;
+        panelTalao.Controls.Add(btnFechar);
+
+        // Ajustar tamanho do panel
+        panelTalao.Size = new Size(440, yPos + 60);
+        panelTalao.Location = new Point(
+            (this.ClientSize.Width - panelTalao.Width) / 2,
+            (this.ClientSize.Height - panelTalao.Height) / 2
+        );
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Erro ao mostrar talão: {ex.Message}");
+    }
+}
         }
 
         private void ImprimirTalao(string numeroFatura, string nomeEquipamento, decimal preco,
