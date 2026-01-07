@@ -36,38 +36,38 @@ namespace M17A_ProjetoFinal_Loja
             ligacaoSQL = new SqlConnection(strligacao);
             ligacaoSQL.Open();
             ligacaoSQL.ChangeDatabase(this.NomeBD);
-            }
+        }
 
         //destrutor
         ~BaseDados()
         {
             //fechar a ligação à bd
         }
+
         void CriarBD()
         {
             //ligação ao servidor
             ligacaoSQL = new SqlConnection(strligacao);
             ligacaoSQL.Open();
-            //veirificar se a bd já existe no catalogo
+            //verificar se a bd já existe no catalogo
             string sql = $@"
                         IF EXISTS(SELECT * FROM master.sys.databases
                                     WHERE name='{this.NomeBD}')
                           BEGIN
                                 USE [master];
-                                EXEC sp_detach_db {this.NomeBD};
+                                EXEC sp_detach_db '{this.NomeBD}';
                           END
                         ";
 
             SqlCommand comando = new SqlCommand(sql, ligacaoSQL);
             comando.ExecuteNonQuery();
             //criar a bd
-            sql = $"CREATE DATABASE {this.NomeBD} ON PRIMARY (NAME={this.NomeBD},FILENAME='{this.CaminhoBD}')";
+            sql = $"CREATE DATABASE {this.NomeBD} ON PRIMARY (NAME='{this.NomeBD}',FILENAME='{this.CaminhoBD}')";
             comando = new SqlCommand(sql, ligacaoSQL);
             comando.ExecuteNonQuery();
             //Associação a ligação à base de dados criada
             ligacaoSQL.ChangeDatabase(this.NomeBD);
             //criar as tabelas
-            //criar tabela livros
             sql = @"
                     CREATE TABLE Equipamentos(
                         Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -79,7 +79,8 @@ namespace M17A_ProjetoFinal_Loja
                         Garantia NVARCHAR(50),
                         Preco DECIMAL(10,2),
                         Descricao NVARCHAR(MAX),
-                        DataEntrada DATETIME DEFAULT GETDATE()
+                        DataEntrada DATETIME DEFAULT GETDATE(),
+                        Imagem NVARCHAR(500)
                     );
 
                     CREATE TABLE Clientes(
@@ -119,6 +120,7 @@ namespace M17A_ProjetoFinal_Loja
             comando.ExecuteNonQuery();
             comando.Dispose();
         }
+
         //Função para executar um select e devolver os registos da bd
         public DataTable DevolveSQL(string sql, List<SqlParameter> parametros = null)
         {
@@ -132,7 +134,5 @@ namespace M17A_ProjetoFinal_Loja
             comando.Dispose();
             return dados;
         }
-
     }
-
 }

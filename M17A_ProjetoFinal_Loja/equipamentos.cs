@@ -8,9 +8,9 @@ using Microsoft.Data.SqlClient;
 
 namespace M17A_ProjetoFinal_Loja
 {
-    public class Equipamentos : Item
+    public class Equipamentos
     {
-        // Propriedades (como campos da tabela)
+        // Propriedades
         public int Id { get; set; }
         public string Nome { get; set; }
         public string CodigoProduto { get; set; }
@@ -55,8 +55,8 @@ namespace M17A_ProjetoFinal_Loja
         public void Adicionar()
         {
             string sql = @"INSERT INTO Equipamentos 
-                          (Nome, CodigoProduto, Categoria, Marca, Compatibilidade, Garantia, Preco, Descricao, DataEntrada) 
-                          VALUES (@Nome, @Codigo, @Categoria, @Marca, @Compatibilidade, @Garantia, @Preco, @Descricao, @DataEntrada)";
+                          (Nome, CodigoProduto, Categoria, Marca, Compatibilidade, Garantia, Preco, Descricao, DataEntrada, Imagem) 
+                          VALUES (@Nome, @Codigo, @Categoria, @Marca, @Compatibilidade, @Garantia, @Preco, @Descricao, @DataEntrada, @Imagem)";
 
             var parametros = new List<SqlParameter>
             {
@@ -68,7 +68,8 @@ namespace M17A_ProjetoFinal_Loja
                 new SqlParameter("@Garantia", Garantia),
                 new SqlParameter("@Preco", Preco),
                 new SqlParameter("@Descricao", Descricao),
-                new SqlParameter("@DataEntrada", DataEntrada)
+                new SqlParameter("@DataEntrada", DataEntrada),
+                new SqlParameter("@Imagem", Imagem ?? (object)DBNull.Value)
             };
 
             bd.ExecutarSQL(sql, parametros);
@@ -86,7 +87,8 @@ namespace M17A_ProjetoFinal_Loja
                           Garantia = @Garantia, 
                           Preco = @Preco, 
                           Descricao = @Descricao, 
-                          DataEntrada = @DataEntrada
+                          DataEntrada = @DataEntrada,
+                          Imagem = @Imagem
                           WHERE Id = @Id";
 
             var parametros = new List<SqlParameter>
@@ -100,16 +102,40 @@ namespace M17A_ProjetoFinal_Loja
                 new SqlParameter("@Garantia", Garantia),
                 new SqlParameter("@Preco", Preco),
                 new SqlParameter("@Descricao", Descricao),
-                new SqlParameter("@DataEntrada", DataEntrada)
+                new SqlParameter("@DataEntrada", DataEntrada),
+                new SqlParameter("@Imagem", Imagem ?? (object)DBNull.Value)
             };
 
             bd.ExecutarSQL(sql, parametros);
         }
 
-        // Método para listar todos os equipamentos
+        // Método para listar todos os equipamentos (SEM Estado)
         public DataTable Listar()
         {
             string sql = "SELECT Id, Nome, CodigoProduto, Categoria, Marca, Preco, DataEntrada FROM Equipamentos ORDER BY Nome";
+            return bd.DevolveSQL(sql);
+        }
+
+        // Método para listar equipamentos com status
+        public DataTable ListarComStatus()
+        {
+            string sql = @"
+                SELECT 
+                    E.Id,
+                    E.Nome,
+                    E.CodigoProduto,
+                    E.Categoria,
+                    E.Marca,
+                    E.Preco,
+                    E.DataEntrada,
+                    CASE 
+                        WHEN EXISTS (SELECT 1 FROM Compras C WHERE C.EquipamentoId = E.Id) 
+                        THEN 'VENDIDO' 
+                        ELSE 'DISPONÍVEL' 
+                    END AS Status
+                FROM Equipamentos E
+                ORDER BY E.Nome";
+
             return bd.DevolveSQL(sql);
         }
 
@@ -136,19 +162,8 @@ namespace M17A_ProjetoFinal_Loja
                 Preco = Convert.ToDecimal(row["Preco"]);
                 Descricao = row["Descricao"].ToString();
                 DataEntrada = Convert.ToDateTime(row["DataEntrada"]);
+                Imagem = row["Imagem"].ToString();
             }
-        }
-
-        // Método para procurar por campo e valor (para pesquisa)
-        public DataTable Procurar(string campo, string valor)
-        {
-            string sql = $"SELECT Id, Nome, CodigoProduto, Categoria, Marca, Preco FROM Equipamentos WHERE {campo} LIKE @Valor ORDER BY Nome";
-            var parametros = new List<SqlParameter>
-            {
-                new SqlParameter("@Valor", $"%{valor}%")
-            };
-
-            return bd.DevolveSQL(sql, parametros);
         }
 
         // Método para apagar equipamento
@@ -162,7 +177,5 @@ namespace M17A_ProjetoFinal_Loja
 
             bd.ExecutarSQL(sql, parametros);
         }
-
-
     }
 }

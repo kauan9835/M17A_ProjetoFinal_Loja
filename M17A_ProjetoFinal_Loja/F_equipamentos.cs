@@ -22,10 +22,6 @@ namespace M17A_ProjetoFinal_Loja
             this.bd = bd;
         }
 
-        // Botão para procurar imagem
-
-
-        // Guardar o equipamento na base de dados
         private void bt_guardar_Click(object sender, EventArgs e)
         {
             // Criar um objeto do tipo Equipamento
@@ -89,7 +85,20 @@ namespace M17A_ProjetoFinal_Loja
             dgv_equipamentos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
             Equipamentos e = new Equipamentos(bd);
-            dgv_equipamentos.DataSource = e.Listar();
+
+            // Use ListarComStatus() em vez de Listar()
+            dgv_equipamentos.DataSource = e.ListarComStatus();
+
+            // Colorir vendidos
+            foreach (DataGridViewRow row in dgv_equipamentos.Rows)
+            {
+                if (row.Cells["Status"]?.Value != null &&
+                    row.Cells["Status"].Value.ToString() == "VENDIDO")
+                {
+                    row.DefaultCellStyle.BackColor = Color.LightGray;
+                    row.DefaultCellStyle.ForeColor = Color.Gray;
+                }
+            }
         }
 
         // Limpar as TextBox do formulário
@@ -116,11 +125,9 @@ namespace M17A_ProjetoFinal_Loja
 
         private void F_equipamentos_Load(object sender, EventArgs e)
         {
-            
             // Esconder botões editar/eliminar inicialmente
             btnEditar.Visible = false;
             btnEliminar.Visible = false;
-
         }
 
         private void dgv_equipamentos_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -157,7 +164,6 @@ namespace M17A_ProjetoFinal_Loja
             btnEliminar.Visible = true;
         }
 
-        // Eliminar o equipamento selecionado
         private void bt_eliminar_Click(object sender, EventArgs e)
         {
             if (equipamentoId == 0)
@@ -179,13 +185,11 @@ namespace M17A_ProjetoFinal_Loja
             }
         }
 
-        // Botão cancelar limpa o formulário
         private void bt_cancelar_Click(object sender, EventArgs e)
         {
             LimparForm();
         }
 
-        // Botão para atualizar o registo selecionado
         private void bt_editar_Click(object sender, EventArgs e)
         {
             // Criar um objeto do tipo Equipamento
@@ -242,14 +246,14 @@ namespace M17A_ProjetoFinal_Loja
 
         private void dgv_equipamentos_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            // Não é necessário código aqui
         }
 
         private void F_equipamentos_Load_1(object sender, EventArgs e)
         {
+            // Carregar equipamentos ao abrir o formulário
             Equipamentos equip = new Equipamentos(bd);
             dgv_equipamentos.DataSource = equip.Listar();
-
         }
 
         private void btnInserirImagem_Click(object sender, EventArgs e)
@@ -293,7 +297,8 @@ namespace M17A_ProjetoFinal_Loja
 
         private void btnCancelar_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            // Alterado: Fechar apenas este formulário, não toda a aplicação
+            this.Close();
         }
 
         private void btnEditar_Click(object sender, EventArgs e)
@@ -348,11 +353,21 @@ namespace M17A_ProjetoFinal_Loja
             // Feedback ao utilizador
             lb_feedback.Text = "Equipamento atualizado com sucesso.";
             lb_feedback.ForeColor = Color.Black;
+
         }
 
         private void btnRemoverImagem_Click(object sender, EventArgs e)
         {
-
+            pictureBox1.Image = null;
+            imagem = "";
         }
+
+        private void btnInserir_Click(object sender, EventArgs e)
+        {
+            // Este botão chama o mesmo método que bt_guardar
+            bt_guardar_Click(sender, e);
+        }
+
+
     }
-    }
+}

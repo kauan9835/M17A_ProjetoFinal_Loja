@@ -15,31 +15,41 @@ namespace M17A_ProjetoFinal_Loja
     public partial class F_compras : Form
     {
         private BaseDados bd;
-        private Dictionary<int, string> clientesDict = new Dictionary<int, string>();
+        private List<ClienteInfo> clientesList = new List<ClienteInfo>();
+
+        // Classe auxiliar para armazenar informações do cliente
+        private class ClienteInfo
+        {
+            public int Id { get; set; }
+            public string Nome { get; set; }
+            public string NIF { get; set; }
+
+            public override string ToString()
+            {
+                return $"{Nome} (NIF: {NIF})";
+            }
+        }
 
         public F_compras(BaseDados bd)
         {
-
             InitializeComponent();
             this.bd = bd;
             CarregarEquipamentos();
             CarregarCategorias();
             CarregarCompatibilidades();
             CarregarClientesNoComboBox();
-
         }
 
         private void CarregarEquipamentos()
         {
+            // Isto está CORRETO - usa ObterEquipamentosDisponiveis
             DataTable dt = Compra.ObterEquipamentosDisponiveis(bd);
-
             dataGridViewEquipamentos.DataSource = dt;
         }
 
         private void CarregarCategorias()
         {
-            string sql = "SELECT DISTINCT Categoria FROM Equipamentos WHERE Categoria IS NOT NULL ORDER BY Categoria";
-            DataTable dt = bd.DevolveSQL(sql);
+            DataTable dt = Compra.ObterCategorias(bd);
 
             cmbCategoria.Items.Clear();
             cmbCategoria.Items.Add(""); // Item vazio para limpar filtro
@@ -52,8 +62,7 @@ namespace M17A_ProjetoFinal_Loja
 
         private void CarregarCompatibilidades()
         {
-            string sql = "SELECT DISTINCT Compatibilidade FROM Equipamentos WHERE Compatibilidade IS NOT NULL ORDER BY Compatibilidade";
-            DataTable dt = bd.DevolveSQL(sql);
+            DataTable dt = Compra.ObterCompatibilidades(bd);
 
             cmbCompatibilidade.Items.Clear();
             cmbCompatibilidade.Items.Add(""); // Item vazio para limpar filtro
@@ -74,29 +83,23 @@ namespace M17A_ProjetoFinal_Loja
 
         private void cmbCategoria_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Filtra automaticamente quando seleciona uma categoria
             btnFiltrar_Click_1(sender, e);
         }
 
         private void cmbCompatibilidade_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Filtra automaticamente quando seleciona uma compatibilidade
             btnFiltrar_Click_1(sender, e);
         }
 
         private void txtNome_TextChanged(object sender, EventArgs e)
         {
-            // Filtra automaticamente quando digita no nome
             btnFiltrar_Click_1(sender, e);
         }
 
         private void txtModelo_TextChanged(object sender, EventArgs e)
         {
-            // Filtra automaticamente quando digita no modelo
             btnFiltrar_Click_1(sender, e);
         }
-
-
 
         private void btnFiltrar_Click_1(object sender, EventArgs e)
         {
@@ -104,8 +107,8 @@ namespace M17A_ProjetoFinal_Loja
             string categoria = cmbCategoria.Text;
             string compatibilidade = cmbCompatibilidade.Text;
             string modelo = txtModelo.Text;
-            DataTable dt = Compra.ObterEquipamentosDisponiveis(bd, nome, categoria, compatibilidade, modelo);
 
+            DataTable dt = Compra.ObterEquipamentosDisponiveis(bd, nome, categoria, compatibilidade, modelo);
             dataGridViewEquipamentos.DataSource = dt;
         }
 
@@ -114,7 +117,7 @@ namespace M17A_ProjetoFinal_Loja
             if (dataGridViewEquipamentos.SelectedRows.Count > 0)
             {
                 // Verificar se um cliente foi selecionado
-                if (cmbClientes.SelectedIndex <= 0) // LINHA MODIFICADA
+                if (cmbClientes.SelectedIndex <= 0)
                 {
                     MessageBox.Show("Por favor, selecione um cliente primeiro!", "Selecionar Cliente",
                                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -122,9 +125,8 @@ namespace M17A_ProjetoFinal_Loja
                     return;
                 }
 
-                // Obter ID do cliente selecionado
-                int clienteId = Convert.ToInt32(clientesDict[cmbClientes.SelectedIndex]); // LINHA NOVA
-                string nomeCliente = cmbClientes.Text.Split('(')[0].Trim(); // LINHA NOVA
+                // Obter o cliente selecionado
+                ClienteInfo clienteSelecionado = (ClienteInfo)cmbClientes.SelectedItem;
 
                 DataGridViewRow row = dataGridViewEquipamentos.SelectedRows[0];
 
@@ -137,10 +139,10 @@ namespace M17A_ProjetoFinal_Loja
                     string numeroFatura = $"FAT-{DateTime.Now:yyyyMMdd-HHmmss}";
                     DateTime dataCompra = DateTime.Now;
 
-                    // USAR A CLASSE COMPRA (sem SQL no F_compras)
+                    // USAR A CLASSE COMPRA
                     var compra = new Compra(bd)
                     {
-                        ClienteId = clienteId,
+                        ClienteId = clienteSelecionado.Id,
                         EquipamentoId = equipamentoId,
                         Quantidade = 1,
                         PrecoUnitario = preco,
@@ -159,12 +161,12 @@ namespace M17A_ProjetoFinal_Loja
                         return;
                     }
 
-                    // Adicionar a compra (SQL está na classe Compra)
+                    // Adicionar a compra
                     compra.Adicionar();
 
-                    // MOSTRAR TALÃO NA TELA - LINHA NOVA
+                    // Mostrar talão na tela
                     MostrarTalaoTela(numeroFatura, nomeEquipamento, preco, dataCompra,
-                                   nomeCliente, cmbClientes.Text);
+                                   clienteSelecionado.Nome, clienteSelecionado.ToString());
 
                     LimparCampos();
                     CarregarEquipamentos();
@@ -191,24 +193,26 @@ namespace M17A_ProjetoFinal_Loja
         {
             try
             {
-                string sql = "SELECT Id, Nome, NIF FROM Clientes ORDER BY Nome";
-                DataTable dt = bd.DevolveSQL(sql);
+                // Usar o método estático da classe Compra
+                DataTable dt = Compra.ObterClientes(bd);
 
                 cmbClientes.Items.Clear();
-                clientesDict.Clear();
+                clientesList.Clear();
 
                 // Adicionar item vazio no início
                 cmbClientes.Items.Add("-- Selecione um cliente --");
 
                 foreach (DataRow row in dt.Rows)
                 {
-                    int id = Convert.ToInt32(row["Id"]);
-                    string nome = row["Nome"].ToString();
-                    string nif = row["NIF"].ToString();
+                    ClienteInfo cliente = new ClienteInfo
+                    {
+                        Id = Convert.ToInt32(row["Id"]),
+                        Nome = row["Nome"].ToString(),
+                        NIF = row["NIF"].ToString()
+                    };
 
-                    string displayText = $"{nome} (NIF: {nif})";
-                    cmbClientes.Items.Add(displayText);
-                    clientesDict.Add(cmbClientes.Items.Count - 1, id.ToString());
+                    clientesList.Add(cliente);
+                    cmbClientes.Items.Add(cliente);
                 }
 
                 cmbClientes.SelectedIndex = 0;
@@ -223,92 +227,90 @@ namespace M17A_ProjetoFinal_Loja
         private void MostrarTalaoTela(string numeroFatura, string nomeEquipamento, decimal preco,
                                      DateTime dataCompra, string nomeCliente, string infoCliente)
         {
-           {
-    try
-    {
-        // Limpar panel
-        panelTalao.Controls.Clear();
-        panelTalao.Visible = true;
-        panelTalao.BackColor = Color.White;
-        panelTalao.BorderStyle = BorderStyle.FixedSingle;
+            try
+            {
+                // Limpar panel
+                panelTalao.Controls.Clear();
+                panelTalao.Visible = true;
+                panelTalao.BackColor = Color.White;
+                panelTalao.BorderStyle = BorderStyle.FixedSingle;
 
-        int yPos = 20;
-        int margem = 20;
+                int yPos = 20;
+                int margem = 20;
 
-        // 1. CABEÇALHO (já tem)
-        Label lblCabecalho = new Label();
-        lblCabecalho.Text = "LOJA DE EQUIPAMENTOS";
-        lblCabecalho.Font = new Font("Arial", 16, FontStyle.Bold);
-        lblCabecalho.Location = new Point(margem, yPos);
-        lblCabecalho.Size = new Size(400, 30);
-        lblCabecalho.TextAlign = ContentAlignment.MiddleCenter;
-        panelTalao.Controls.Add(lblCabecalho);
-        yPos += 40;
+                // 1. CABEÇALHO
+                Label lblCabecalho = new Label();
+                lblCabecalho.Text = "LOJA DE EQUIPAMENTOS";
+                lblCabecalho.Font = new Font("Arial", 16, FontStyle.Bold);
+                lblCabecalho.Location = new Point(margem, yPos);
+                lblCabecalho.Size = new Size(400, 30);
+                lblCabecalho.TextAlign = ContentAlignment.MiddleCenter;
+                panelTalao.Controls.Add(lblCabecalho);
+                yPos += 40;
 
-        // 2. Fatura e Data
-        Label lblFatura = new Label();
-        lblFatura.Text = $"Fatura: {numeroFatura}";
-        lblFatura.Font = new Font("Arial", 10);
-        lblFatura.Location = new Point(margem, yPos);
-        lblFatura.Size = new Size(400, 20);
-        panelTalao.Controls.Add(lblFatura);
-        yPos += 25;
+                // 2. Fatura e Data
+                Label lblFatura = new Label();
+                lblFatura.Text = $"Fatura: {numeroFatura}";
+                lblFatura.Font = new Font("Arial", 10);
+                lblFatura.Location = new Point(margem, yPos);
+                lblFatura.Size = new Size(400, 20);
+                panelTalao.Controls.Add(lblFatura);
+                yPos += 25;
 
-        Label lblData = new Label();
-        lblData.Text = $"Data: {dataCompra:dd/MM/yyyy HH:mm}";
-        lblData.Font = new Font("Arial", 10);
-        lblData.Location = new Point(margem, yPos);
-        lblData.Size = new Size(400, 20);
-        panelTalao.Controls.Add(lblData);
-        yPos += 30;
+                Label lblData = new Label();
+                lblData.Text = $"Data: {dataCompra:dd/MM/yyyy HH:mm}";
+                lblData.Font = new Font("Arial", 10);
+                lblData.Location = new Point(margem, yPos);
+                lblData.Size = new Size(400, 20);
+                panelTalao.Controls.Add(lblData);
+                yPos += 30;
 
-        // 3. Cliente
-        Label lblCliente = new Label();
-        lblCliente.Text = $"Cliente: {nomeCliente}";
-        lblCliente.Font = new Font("Arial", 10, FontStyle.Bold);
-        lblCliente.Location = new Point(margem, yPos);
-        lblCliente.Size = new Size(400, 20);
-        panelTalao.Controls.Add(lblCliente);
-        yPos += 25;
+                // 3. Cliente
+                Label lblCliente = new Label();
+                lblCliente.Text = $"Cliente: {nomeCliente}";
+                lblCliente.Font = new Font("Arial", 10, FontStyle.Bold);
+                lblCliente.Location = new Point(margem, yPos);
+                lblCliente.Size = new Size(400, 20);
+                panelTalao.Controls.Add(lblCliente);
+                yPos += 25;
 
-        // 4. Produto
-        Label lblProduto = new Label();
-        lblProduto.Text = $"Produto: {nomeEquipamento}";
-        lblProduto.Font = new Font("Arial", 10);
-        lblProduto.Location = new Point(margem, yPos);
-        lblProduto.Size = new Size(400, 20);
-        panelTalao.Controls.Add(lblProduto);
-        yPos += 25;
+                // 4. Produto
+                Label lblProduto = new Label();
+                lblProduto.Text = $"Produto: {nomeEquipamento}";
+                lblProduto.Font = new Font("Arial", 10);
+                lblProduto.Location = new Point(margem, yPos);
+                lblProduto.Size = new Size(400, 20);
+                panelTalao.Controls.Add(lblProduto);
+                yPos += 25;
 
-        // 5. Preço
-        Label lblPreco = new Label();
-        lblPreco.Text = $"Preço: {preco:C2}";
-        lblPreco.Font = new Font("Arial", 10);
-        lblPreco.Location = new Point(margem, yPos);
-        lblPreco.Size = new Size(400, 20);
-        panelTalao.Controls.Add(lblPreco);
-        yPos += 40;
+                // 5. Preço
+                Label lblPreco = new Label();
+                lblPreco.Text = $"Preço: {preco:C2}";
+                lblPreco.Font = new Font("Arial", 10);
+                lblPreco.Location = new Point(margem, yPos);
+                lblPreco.Size = new Size(400, 20);
+                panelTalao.Controls.Add(lblPreco);
+                yPos += 40;
 
-        // 6. Botão Fechar
-        Button btnFechar = new Button();
-        btnFechar.Text = "Fechar";
-        btnFechar.Location = new Point(150, yPos);
-        btnFechar.Size = new Size(100, 30);
-        btnFechar.Click += (s, e) => panelTalao.Visible = false;
-        panelTalao.Controls.Add(btnFechar);
+                // 6. Botão Fechar
+                Button btnFechar = new Button();
+                btnFechar.Text = "Fechar";
+                btnFechar.Location = new Point(150, yPos);
+                btnFechar.Size = new Size(100, 30);
+                btnFechar.Click += (s, e) => panelTalao.Visible = false;
+                panelTalao.Controls.Add(btnFechar);
 
-        // Ajustar tamanho do panel
-        panelTalao.Size = new Size(440, yPos + 60);
-        panelTalao.Location = new Point(
-            (this.ClientSize.Width - panelTalao.Width) / 2,
-            (this.ClientSize.Height - panelTalao.Height) / 2
-        );
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show($"Erro ao mostrar talão: {ex.Message}");
-    }
-}
+                // Ajustar tamanho do panel
+                panelTalao.Size = new Size(440, yPos + 60);
+                panelTalao.Location = new Point(
+                    (this.ClientSize.Width - panelTalao.Width) / 2,
+                    (this.ClientSize.Height - panelTalao.Height) / 2
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao mostrar talão: {ex.Message}");
+            }
         }
 
         private void ImprimirTalao(string numeroFatura, string nomeEquipamento, decimal preco,
@@ -327,8 +329,33 @@ namespace M17A_ProjetoFinal_Loja
                     Font fontNegrito = new Font("Arial", 12, FontStyle.Bold);
                     Font fontPequeno = new Font("Arial", 10);
 
-                    // ... (código de impressão completo)
-                    // COLAR AQUI TODO O CÓDIGO DO EVENTO PrintPage
+                    // Código de impressão...
+                    float y = 50;
+
+                    // Título
+                    g.DrawString("LOJA DE EQUIPAMENTOS", fontTitulo, Brushes.Black, 50, y);
+                    y += 40;
+
+                    // Fatura e Data
+                    g.DrawString($"Fatura: {numeroFatura}", fontNormal, Brushes.Black, 50, y);
+                    y += 25;
+                    g.DrawString($"Data: {dataCompra:dd/MM/yyyy HH:mm}", fontNormal, Brushes.Black, 50, y);
+                    y += 30;
+
+                    // Cliente
+                    g.DrawString($"Cliente: {nomeCliente}", fontNegrito, Brushes.Black, 50, y);
+                    y += 25;
+
+                    // Produto
+                    g.DrawString($"Produto: {nomeEquipamento}", fontNormal, Brushes.Black, 50, y);
+                    y += 25;
+
+                    // Preço
+                    g.DrawString($"Preço: {preco:C2}", fontNormal, Brushes.Black, 50, y);
+                    y += 40;
+
+                    // Rodapé
+                    g.DrawString("Obrigado pela sua compra!", fontNegrito, Brushes.Black, 50, y);
                 };
 
                 PrintDialog printDialog = new PrintDialog();
@@ -348,8 +375,6 @@ namespace M17A_ProjetoFinal_Loja
                 MessageBox.Show($"Erro ao imprimir: {ex.Message}", "Erro",
                                MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-
         }
     }
 }

@@ -20,18 +20,6 @@ namespace M17A_ProjetoFinal_Loja
             bd = new BaseDados("M17A_loja");
         }
 
-        private void cb_consultas_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cb_consultas.SelectedIndex <= 0) return;
-            string[] consultas = new string[] { "",
-                @"SELECT Compras.*, Clientes.Nome, Equipamentos.Nome as NomeEquipamento 
-                FROM Compras INNER JOIN Clientes ON Clientes.Id = Compras.ClienteId
-                INNER JOIN Equipamentos ON Equipamentos.Id = Compras.EquipamentoId" };
-            DataTable dados = bd.DevolveSQL(consultas[cb_consultas.SelectedIndex]);
-
-            dgv_consultas.DataSource = dados;
-        }
-
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
 

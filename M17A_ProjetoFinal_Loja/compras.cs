@@ -52,78 +52,7 @@ namespace M17A_ProjetoFinal_Loja
                   VALUES (@ClienteId, @EquipamentoId, @Quantidade, @PrecoUnitario, @NumeroFatura, @DataCompra)";
 
             var parametros = new List<SqlParameter>
-    {
-        new SqlParameter("@ClienteId", ClienteId),
-        new SqlParameter("@EquipamentoId", EquipamentoId),
-        new SqlParameter("@Quantidade", Quantidade),
-        new SqlParameter("@PrecoUnitario", PrecoUnitario),
-        new SqlParameter("@NumeroFatura", NumeroFatura),
-        new SqlParameter("@DataCompra", DataCompra)
-    };
-
-            bd.ExecutarSQL(sql, parametros);
-
-            // TENTA ATUALIZAR O EQUIPAMENTO DE DIFERENTES FORMAS
-            try
             {
-                // Opção 1: Se tiver coluna 'Vendido'
-                string updateSql = "UPDATE Equipamentos SET Vendido = 1 WHERE Id = @Id";
-                var updateParams = new List<SqlParameter>
-        {
-            new SqlParameter("@Id", EquipamentoId)
-        };
-                bd.ExecutarSQL(updateSql, updateParams);
-            }
-            catch
-            {
-                try
-                {
-                    // Opção 2: Se tiver coluna 'Disponivel'
-                    string updateSql = "UPDATE Equipamentos SET Disponivel = 0 WHERE Id = @Id";
-                    var updateParams = new List<SqlParameter>
-            {
-                new SqlParameter("@Id", EquipamentoId)
-            };
-                    bd.ExecutarSQL(updateSql, updateParams);
-                }
-                catch
-                {
-                    try
-                    {
-                        // Opção 3: Se tiver coluna 'Stock'
-                        string updateSql = "UPDATE Equipamentos SET Stock = Stock - 1 WHERE Id = @Id";
-                        var updateParams = new List<SqlParameter>
-                {
-                    new SqlParameter("@Id", EquipamentoId)
-                };
-                        bd.ExecutarSQL(updateSql, updateParams);
-                    }
-                    catch
-                    {
-                        // Se não tiver nenhuma coluna, não faz nada
-                        // O equipamento ficará sempre visível
-                    }
-                }
-            }
-        }
-
-
-
-        // Método para atualizar compra
-        public void Atualizar()
-        {
-            string sql = @"UPDATE Compras SET 
-                          ClienteId = @ClienteId, 
-                          EquipamentoId = @EquipamentoId, 
-                          Quantidade = @Quantidade, 
-                          PrecoUnitario = @PrecoUnitario, 
-                          NumeroFatura = @NumeroFatura, 
-                          DataCompra = @DataCompra
-                          WHERE Id = @Id";
-
-            var parametros = new List<SqlParameter>
-            {
-                new SqlParameter("@Id", Id),
                 new SqlParameter("@ClienteId", ClienteId),
                 new SqlParameter("@EquipamentoId", EquipamentoId),
                 new SqlParameter("@Quantidade", Quantidade),
@@ -135,7 +64,7 @@ namespace M17A_ProjetoFinal_Loja
             bd.ExecutarSQL(sql, parametros);
         }
 
-        // Método para listar todas as compras com JOIN
+        // Método para listar todas as compras
         public DataTable Listar()
         {
             string sql = @"
@@ -149,119 +78,32 @@ namespace M17A_ProjetoFinal_Loja
             return bd.DevolveSQL(sql);
         }
 
-        // Método para procurar compra por ID
-        public void Procurar()
+        // Método para obter equipamentos disponíveis (SEM Estado)
+        public static DataTable ObterEquipamentosDisponiveis(BaseDados bd, string filtroNome = "",
+                                                           string filtroCategoria = "",
+                                                           string filtroCompatibilidade = "",
+                                                           string filtroModelo = "")
         {
-            string sql = "SELECT * FROM Compras WHERE Id = @Id";
-            var parametros = new List<SqlParameter>
-            {
-                new SqlParameter("@Id", Id)
-            };
-
-            DataTable dt = bd.DevolveSQL(sql, parametros);
-
-            if (dt.Rows.Count > 0)
-            {
-                DataRow row = dt.Rows[0];
-                ClienteId = Convert.ToInt32(row["ClienteId"]);
-                EquipamentoId = Convert.ToInt32(row["EquipamentoId"]);
-                Quantidade = Convert.ToInt32(row["Quantidade"]);
-                PrecoUnitario = Convert.ToDecimal(row["PrecoUnitario"]);
-                NumeroFatura = row["NumeroFatura"].ToString();
-                DataCompra = Convert.ToDateTime(row["DataCompra"]);
-            }
-        }
-
-        // Método para procurar compras por cliente
-        public DataTable ProcurarPorCliente(string nomeCliente)
-        {
+            // CONSULTA SIMPLES - NÃO USA Estado
             string sql = @"
-                SELECT c.Id, cl.Nome as Cliente, e.Nome as Equipamento, 
-                       c.Quantidade, c.PrecoUnitario, c.NumeroFatura, c.DataCompra
-                FROM Compras c
-                INNER JOIN Clientes cl ON c.ClienteId = cl.Id
-                INNER JOIN Equipamentos e ON c.EquipamentoId = e.Id
-                WHERE cl.Nome LIKE @NomeCliente
-                ORDER BY c.DataCompra DESC";
-
-            var parametros = new List<SqlParameter>
-            {
-                new SqlParameter("@NomeCliente", $"%{nomeCliente}%")
-            };
-
-            return bd.DevolveSQL(sql, parametros);
-        }
-
-        // Método para apagar compra
-        public void Apagar()
-        {
-            string sql = "DELETE FROM Compras WHERE Id = @Id";
-            var parametros = new List<SqlParameter>
-            {
-                new SqlParameter("@Id", Id)
-            };
-
-            bd.ExecutarSQL(sql, parametros);
-        }
-
-        // Método para calcular total da compra
-        public decimal CalcularTotal()
-        {
-            return Quantidade * PrecoUnitario;
-        }
-
-        public void AtualizarStock()
-        {
-            string sqlSelect = "SELECT Stock FROM Equipamentos WHERE Id = @Id";
-            var p1 = new List<SqlParameter> { new SqlParameter("@Id", EquipamentoId) };
-
-            DataTable dt = bd.DevolveSQL(sqlSelect, p1);
-            int stockAtual = Convert.ToInt32(dt.Rows[0]["Stock"]);
-            int novoStock = stockAtual - Quantidade;
-
-            if (novoStock < 0)
-                novoStock = 0;
-
-            string sqlUpdate = "UPDATE Equipamentos SET Stock = @Stock WHERE Id = @Id";
-            var p2 = new List<SqlParameter>
-    {
-        new SqlParameter("@Stock", novoStock),
-        new SqlParameter("@Id", EquipamentoId)
-    };
-
-            bd.ExecutarSQL(sqlUpdate, p2);
-        }
-
-        public void AtualizarEstadoEquipamentoVendido()
-        {
-            try
-            {
-                string sql = "UPDATE Equipamentos SET Estado = 0 WHERE Id = @Id";
-                var parametros = new List<SqlParameter>
-        {
-            new SqlParameter("@Id", this.EquipamentoId)
-        };
-                bd.ExecutarSQL(sql, parametros);
-            }
-            catch
-            {
-                // Se não tiver coluna Estado, ignora
-            }
-        }
-
-            public static DataTable ObterEquipamentosDisponiveis(BaseDados bd, string filtroNome = "",
-                                                   string filtroCategoria = "",
-                                                   string filtroCompatibilidade = "",
-                                                   string filtroModelo = "")
-        {
-            string sql = @"
-        SELECT E.* 
-        FROM Equipamentos E
-        WHERE E.Id NOT IN (
-            SELECT EquipamentoId 
-            FROM Compras 
-            WHERE EquipamentoId IS NOT NULL
-        )";
+                SELECT 
+                    E.Id,
+                    E.Nome,
+                    E.CodigoProduto,
+                    E.Categoria,
+                    E.Marca,
+                    E.Compatibilidade,
+                    E.Garantia,
+                    E.Preco,
+                    E.Descricao,
+                    E.DataEntrada,
+                    E.Imagem
+                FROM Equipamentos E
+                WHERE NOT EXISTS (
+                    SELECT 1 
+                    FROM Compras C 
+                    WHERE C.EquipamentoId = E.Id
+                )";
 
             var parametros = new List<SqlParameter>();
 
@@ -294,6 +136,23 @@ namespace M17A_ProjetoFinal_Loja
             return bd.DevolveSQL(sql, parametros);
         }
 
+        // Métodos auxiliares (opcionais)
+        public static DataTable ObterCategorias(BaseDados bd)
+        {
+            string sql = "SELECT DISTINCT Categoria FROM Equipamentos WHERE Categoria IS NOT NULL ORDER BY Categoria";
+            return bd.DevolveSQL(sql);
+        }
 
+        public static DataTable ObterCompatibilidades(BaseDados bd)
+        {
+            string sql = "SELECT DISTINCT Compatibilidade FROM Equipamentos WHERE Compatibilidade IS NOT NULL ORDER BY Compatibilidade";
+            return bd.DevolveSQL(sql);
+        }
+
+        public static DataTable ObterClientes(BaseDados bd)
+        {
+            string sql = "SELECT Id, Nome, NIF FROM Clientes ORDER BY Nome";
+            return bd.DevolveSQL(sql);
+        }
     }
-    }
+}
